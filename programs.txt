@@ -1,0 +1,370 @@
+//Program 1
+#include <stdio.h>
+#include <stdlib.h>
+#include <GL/glut.h>
+
+int x1, y11, x2, y2;
+
+void init() {
+    glClearColor(1, 1, 1, 1); // Set background color to white
+    gluOrtho2D(0, 500, 0, 500); // Set the coordinate system
+}
+
+void plotpoint(int x, int y) {
+    glColor3f(1, 0, 0); // Set point color to red
+    glBegin(GL_POINTS);
+    glVertex2i(x, y);
+    glEnd();
+    glFlush();
+}
+
+void LineBres(int x1, int y1, int x2, int y2) {
+    int dx = abs(x2 - x1);
+    int dy = abs(y2 - y1);
+    int incx = (x2 > x1) ? 1 : -1;
+    int incy = (y2 > y1) ? 1 : -1;
+    int x = x1;
+    int y = y1;
+    int p;
+
+    if (dx > dy) {
+        p = 2 * dy - dx;
+        for (int i = 0; i <= dx; i++) {
+            plotpoint(x, y);
+            x += incx;
+            if (p < 0) {
+                p += 2 * dy;
+            } else {
+                y += incy;
+                p += 2 * dy - 2 * dx;
+            }
+        }
+    } else {
+        p = 2 * dx - dy;
+        for (int i = 0; i <= dy; i++) {
+            plotpoint(x, y);
+            y += incy;
+            if (p < 0) {
+                p += 2 * dx;
+            } else {
+                x += incx;
+                p += 2 * dx - 2 * dy;
+            }
+        }
+    }
+}
+
+void Display() {
+    // glClear(GL_COLOR_BUFFER_BIT); // Clear the window
+    LineBres(100, 500 ,300 ,155);
+}
+
+int main(int argc, char **argv) {
+    printf("Enter 2 points (x1 y1 x2 y2): ");
+    // scanf("%d%d%d%d", &x1, &y11, &x2, &y2);
+
+    glutInit(&argc, argv);
+    glutInitWindowSize(500, 500);
+    glutCreateWindow("Line Drawing");
+    init();
+    glutDisplayFunc(Display);
+    glutMainLoop();
+    return 0;
+}
+
+
+-------------
+
+Program 2
+#include <GL/glut.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+float x[3][3] = {{0, 100, 50}, {0, 0, 50}, {1, 1, 1}};
+float r[3][3];
+void myinit()
+{
+    glClearColor(1, 1, 1, 0);
+    gluOrtho2D(-100, 500, -100, 500);
+}
+void triangle(float x[3][3])
+{
+    glColor4s(1, 1, 1, 0);
+    glBegin(GL_TRIANGLES);
+    glVertex2f(x[0][0], x[1][0]);
+    glVertex2f(x[0][1], x[1][1]);
+    glVertex2f(x[0][2], x[1][2]);
+    glEnd();
+}
+void matrixmul(float mul[3][3])
+{
+    for (int i = 0; i < 3; i++)
+    {
+        for (int j = 0; j < 3; j++)
+        {
+            r[i][j] = 0;
+            for (int k = 0; k < 3; k++)
+            {
+                r[i][j] = r[i][j] + mul[i][k] * x[k][j];
+            }
+        }
+    }
+}
+void translation()
+{
+    float t[3][3] = {{1, 0, 100}, {0, 1, 0}, {0, 0, 1}};
+    printf("Enter the values of Tx and Ty: ");
+    scanf("%f %f", &t[0][2], &t[1][2]);
+    matrixmul(t);
+    triangle(r);
+}
+void scaling()
+{
+    float s[3][3] = {{1, 0, 0}, {0, 1, 0}, {0, 0, 1}};
+    printf("Enter the values of Sx and Sy: ");
+    scanf("%f %f", &s[0][0], &s[1][1]);
+    matrixmul(s);
+    triangle(r);
+}
+void rotation()
+{
+    float theta = 0;
+    printf("Enter the angle: ");
+    scanf("%f", &theta);
+    float angle = theta * 3.14 / 180;
+    float cosx = cos(angle);
+    float sinx = sin(angle);
+    float rr[3][3] = {{cosx, -sinx, 30}, {sinx, cosx, 40}, {0, 0, 1}};
+    matrixmul(rr);
+    triangle(r);
+}
+void displayMe()
+{
+    while (1)
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+        glColor3d(1, 0, 0);
+        int ch;
+        printf("Enter the choice: \n0: For Normal Triangle \n1:For Translation \n2: For Scaling \n3: For Rotation \n4: Exit \n");
+        scanf("%d", &ch);
+        glColor3d(1, 1, 1); // Color of the Object
+        switch (ch)
+        {
+        case 0:
+            triangle(x);
+            break;
+        case 1:
+            translation();
+            break;
+        case 2:
+            scaling();
+            break;
+        case 3:
+            rotation();
+            break;
+        case 4:
+            exit(0);
+        default:
+            printf("Enter a valid choice!");
+        }
+        glColor3d(1, 0, 0);
+        triangle(x);
+        glFlush();
+    }
+}
+int main(int argc, char **argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE);
+    glutInitWindowSize(500, 500);
+    glutCreateWindow("Program-2");
+    myinit();
+    glutDisplayFunc(displayMe);
+    glutMainLoop();
+    return 0;
+}
+
+
+program 3
+#include <GL/glut.h>
+#include <stdio.h>
+void myinit()
+{
+    gluOrtho2D(-500, 500, -500, 500);
+}
+void drawTriangle()
+{
+    glBegin(GL_TRIANGLES);
+    glVertex2f(100, 100);
+    glVertex2f(200, 100);
+    glVertex2f(150, 150);
+    glEnd();
+}
+void translate()
+{
+    glPushMatrix();
+    glTranslated(100, 0, 0);
+    drawTriangle();
+    glPopMatrix();
+}
+void rotate_triangle()
+{
+    glPushMatrix();
+    glRotated(45, 0, 0, 1);
+    drawTriangle();
+    glPopMatrix();
+}
+void pivot_point_rotate()
+{
+    glColor3f(0, 0, 0);
+    glPushMatrix();
+    glTranslated(100, 100, 0);
+    glRotated(45, 0, 0, 1);
+    glTranslated(-100, -100, 0);
+    drawTriangle();
+    glPopMatrix();
+}
+void scale_triangle()
+{
+    glPushMatrix();
+    glScaled(2, 2, 1);
+    drawTriangle();
+    glPopMatrix();
+}
+void pivot_point_scale()
+{
+    glColor3f(0, 0, 0);
+    glPushMatrix();
+    glTranslated(100, 100, 0);
+    glScaled(2, 2, 1);
+    glTranslated(-100, -100, 0);
+    drawTriangle();
+    glPopMatrix();
+}
+void display()
+{
+    glClear(GL_COLOR_BUFFER_BIT);
+    glClearColor(1, 1, 1, 0);
+    glColor3f(1, 1, 0);
+    drawTriangle();
+    glFlush();
+}
+void menu_rotate(int id)
+{
+    switch (id)
+    {
+    case 1:
+        translate();
+        break;
+    case 2:
+        rotate_triangle();
+        break;
+    case 3:
+        pivot_point_rotate();
+        break;
+    case 4:
+        scale_triangle();
+        break;
+    case 5:
+        pivot_point_scale();
+        break;
+    default:
+        exit(0);
+    }
+}
+int main(int argc, char **argv)
+{
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB);
+    glutInitWindowSize(500, 500);
+    glutCreateWindow("Transformation");
+    myinit();
+    glutDisplayFunc(display);
+    glutCreateMenu(menu_rotate);
+    glutAddMenuEntry("Translate", 1);
+    glutAddMenuEntry("Rotation about origin", 2);
+    glutAddMenuEntry("Rotation about fixed point", 3);
+    glutAddMenuEntry("Scale about origin", 4);
+    glutAddMenuEntry("Scale about fixed point", 5);
+    glutAddMenuEntry("EXIT", 6);
+    glutAttachMenu(GLUT_RIGHT_BUTTON);
+    glutMainLoop();
+    return 0;
+}
+
+Program 4
+#include <GL/glut.h>
+#include <stdlib.h>
+#include <stdio.h>
+typedef float point[3];
+point v[] = {
+    {0.0, 0.0, 1.0},
+    {0.0, 1.0, 0.0},
+    {-1.0, -1.0, 0.0},
+    {1.0, -1.0, 0.0}};
+int n;
+void triangle(point a, point b, point c)
+{
+    glBegin(GL_TRIANGLES);
+    glVertex3fv(a);
+    glVertex3fv(b);
+    glVertex3fv(c);
+    glEnd();
+}
+void divide_tri(point a, point b, point c, int m)
+{
+    point v1, v2, v3;
+    int j;
+    if (m > 1)
+    {
+        for (j = 0; j < 3; j++)
+            v1[j] = (a[j] + b[j]) / 2;
+        for (j = 0; j < 3; j++)
+            v2[j] = (a[j] + c[j]) / 2;
+        for (j = 0; j < 3; j++)
+            v3[j] = (c[j] + b[j]) / 2;
+        divide_tri(a, v1, v2, m - 1);
+        divide_tri(c, v2, v3, m - 1);
+        divide_tri(b, v3, v1, m - 1);
+    }
+    else
+    {
+        triangle(a, b, c);
+    }
+}
+void tetrahedron(int m)
+{
+    glColor3f(1.0, 0.0, 0.0);
+    divide_tri(v[0], v[1], v[2], m);
+    glColor3f(0.0, 0.0, 0.0);
+    divide_tri(v[3], v[2], v[1], m);
+    glColor3f(0.0, 1.0, 0.0);
+    divide_tri(v[0], v[3], v[1], m);
+    glColor3f(0.0, 0.0, 1.0);
+    divide_tri(v[0], v[2], v[3], m);
+}
+void display()
+{
+    tetrahedron(n);
+    glFlush();
+}
+void myinit()
+{
+    glClearColor(1.0, 1.0, 1.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glOrtho(-2.0, 2.0, -2.0, 2.0, -2.0, 2.0);
+}
+int main(int argc, char **argv)
+{
+    printf("\nEnter the number of recursive steps you want:");
+    scanf("%d", &n);
+    glutInit(&argc, argv);
+    glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
+    glutInitWindowSize(500, 500);
+    glutCreateWindow("Ex 8: 3d Sierpinski's Gasket");
+    glutDisplayFunc(display);
+    myinit();
+    glEnable(GL_DEPTH_TEST);
+    glutMainLoop();
+    return 0;
+}
